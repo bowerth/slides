@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Patent Novelty</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../public/css/example.css" />
+        <style>
+         @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+         @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+         @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+         body { font-family: 'Droid Serif'; }
+         h1, h2, h3 {
+             font-family: 'Yanone Kaffeesatz';
+             font-weight: normal;
+         }
+         .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+        </style>
+    </head>
+    <body>
+        <textarea id="source">
+
+class: inverse, center, middle
+
+# STI Patent Novelty
+
+---
+
+## Input Data
+
+http://www.patentsview.org/download/
+
+- `claim`: Full text of patent claims, including dependency and sequence
+- `nber_subcategory`: Lookup table for NBER subcategories
+
+other
+
+- `stopwords_8Jan2019.txt`: stopwords from "Kelly"
+- `roman_numerals_25Jan2019.txt`: remove roman numbering used in the claims text
+
+---
+
+## Data Cleaning in Python
+
+`3_WordFrequency_NoNLTK_Stopwords2.py`: transform abstract paragraphs `text` -> `text_cl`
+
+- lowercase
+- remove punctuation
+- remove numbers
+- remove stopwords "Kelly"
+- remove Roman numbers
+- remove specific terms frequent in claims as included in Ashtor's novelty paper
+
+result: `1_claim_nber_31_clean_forVector.csv`
+
+```
+,patent_id,text,cl_text
+0,3930799,"Apparatus as claimed in claim 2 in which the interior of said drum is
+1,3930944,"The process of claim 1 wherein said pronase is used in an amount of b
+2,3930945,"The process of producing urokinase from a contiguous culture of live 
+3,3930946,"A process for the preparation of .alpha.-ketoglutaric acid which comp
+4,3930947,"A method which comprises culturing Methylomonas sp. FERM P-2400 in an
+5,3930948,"A method as set forth in claim 1, wherein, said Micrococcus is Microc
+6,3930949,"A process according to claim 1 for the production of 7-aminocephalosp
+7,3930950,"The method of claim 1 wherein said enzyme-substrate complex is formed
+8,3930951,"The method of claim 1 wherein the enzyme of the enzyme solution is ur
+```
+
+---
+
+## Word Count using Python sklearn
+
+[sklearn.feature_extraction.text.CountVectorizer](https://scikit-learn.org/stable/modules/generated/sklearn.feature_extraction.text.CountVectorizer.html)
+
+*If you do not provide an a-priori dictionary and you do not use an analyzer that does some kind of feature selection then the number of features will be equal to the vocabulary size found by analyzing the data.*
+
+```
+vectorizer = CountVectorizer(analyzer='word', ngram_range=(1, 1), min_df=1)
+```
+
+`analyzer`
+
+- Whether the feature should be made of word or character n-grams.
+
+`ngram_range: tuple (min_n, max_n)`
+
+- The lower and upper boundary of the range of `n`-values for different n-grams to be extracted.
+- All values of `n` such that `min_n <= n <= max_n` will be used.
+
+`min_df`
+
+- When building the vocabulary ignore terms that have a document frequency strictly lower than the given threshold. This value is also called cut-off in the literature.
+- If float, the parameter represents a proportion of documents, integer absolute counts.
+
+---
+
+## Objective: Sparse matrix with words in columns
+
+- number of patent claims by NBER subcategory 31: `r = 532291`
+- number of unique words that appear in at least 10 patent claims: `c = 75497`
+- size of the sparse matrix: `532291 x 75497 = 40 186 373 627` cells (40bn cells)
+
+
+[SAS Blogs: How much RAM do I need to store that matrix?](https://blogs.sas.com/content/iml/2014/04/28/how-much-ram-do-i-need-to-store-that-matrix.html)
+
+- `1GB = 1024^3 bytes = 2^30 bytes = 1.07 x 10^9 bytes`
+- an `r x c` double-precision matrix requires `( r * c * 8 ) / ( 1.07 * 10^9 )` gigabytes of RAM
+
+.center[![](assets/t_RAMGB.png)]
+
+- `532291 * 75497 * 8 / ( 1.07 * 10^9 ) = 300.459` GB
+
+---
+
+## Wordcount in Apache Spark SQL
+
+[stackoverflow: how to get a tuple for the grouped by result on a spark dataframe](https://stackoverflow.com/questions/49248357/how-to-get-a-tuple-for-the-grouped-by-result-on-a-spark-dataframe)
+
+I want to group the results of the group by id to return a list of tuples per id
+
+```
++----------+---------------------+-----+
+|        id|            pets_type|count|
++----------+---------------------+-----+
+|         0|                    0|    2|
+|         1|                    0|    3|
+|         1|                    3|    3|
+|        10|                    0|    4| <- example
+|        10|                    1|    1| <-
+|        13|                    0|    3|
+|        16|                    1|    3|
+|        17|                    1|    1|
+|        18|                    1|    2|
+|        18|                    0|    1|
+|        19|                    1|    7|
++----------+---------------------+-----+
+```
+
+---
+
+## Wordcount in Apache Spark SQL
+
+```
+import org.apache.spark.sql.functions._
+val pet_type_count = df.withColumn("struct", struct("pets_type", "count"))
+  .groupBy("id").agg(collect_list(col("struct")).as("pets_type_count"))
+  .orderBy("id")
+```
+
+```
++---+---------------+
+|id |pets_type_count|
++---+---------------+
+|0  |[[0,2]]        |
+|1  |[[0,3], [3,3]] |
+|10 |[[0,4], [1,1]] | <- example
+|13 |[[0,3]]        |
+|16 |[[1,3]]        |
+|17 |[[1,1]]        |
+|18 |[[1,2], [0,1]] |
+|19 |[[1,7]]        |
++---+---------------+
+```
+
+---
+
+## Wordcount in Apache Spark SQL
+
+Inverted index: for each unique word `k`, list all pairs of patent_id `pid` and word_count `n`
+
+`$ head -n 10 part-00000-e8dd44a6-e1b4-4779-b140-44adf1475ebe-c000.json | cut -c -80`
+
+```
+{"k":"method","v":[{"pid":"3973039","n":18},{"pid":"3983006","n":16},{"pid":"3985617","n":14},{"pid":"3989821","n":
+{"k":"group","v":[{"pid":"3966939","n":58},{"pid":"3973001","n":4},{"pid":"4049494","n":2},{"pid":"4058610","n":34}
+{"k":"consisting","v":[{"pid":"3962437","n":2},{"pid":"3975513","n":8},{"pid":"3991202","n":36},{"pid":"3993746","n
+{"k":"comprises","v":[{"pid":"3956068","n":2},{"pid":"3976544","n":10},{"pid":"3992264","n":2},{"pid":"3993758","n"
+{"k":"amount","v":[{"pid":"3966949","n":8},{"pid":"3995045","n":2},{"pid":"3996369","n":4},{"pid":"4009267","n":2},
+{"k":"composition","v":[{"pid":"3966946","n":10},{"pid":"3970748","n":4},{"pid":"3980793","n":32},{"pid":"3984551",
+{"k":"acid","v":[{"pid":"3968241","n":10},{"pid":"4011333","n":15},{"pid":"4029787","n":3},{"pid":"4029815","n":4},
+{"k":"effective","v":[{"pid":"3961059","n":2},{"pid":"3937829","n":12},{"pid":"4002746","n":2},{"pid":"4025625","n"
+{"k":"compound","v":[{"pid":"3987177","n":14},{"pid":"3995051","n":10},{"pid":"4035497","n":8},{"pid":"4048313","n"
+{"k":"acceptable","v":[{"pid":"3976774","n":2},{"pid":"3985881","n":16},{"pid":"3987167","n":2},{"pid":"4011330","n
+{"k":"administering","v":[{"pid":"4012528","n":2},{"pid":"4016253","n":6},{"pid":"4021555","n":2},{"pid":"4042709",
+{"k":"formula","v":[{"pid":"3962451","n":4},{"pid":"3973027","n":2},{"pid":"3975540","n":8},{"pid":"3982006","n":8}
+{"k":"pharmaceutically","v":[{"pid":"3983249","n":2},{"pid":"3988467","n":26},{"pid":"3993758","n":16},{"pid":"4039
+{"k":"form","v":[{"pid":"3954959","n":2},{"pid":"3983228","n":6},{"pid":"3984552","n":4},{"pid":"3996348","n":6},{"
+{"k":"carrier","v":[{"pid":"4001423","n":4},{"pid":"4002751","n":2},{"pid":"4009276","n":4},{"pid":"4009847","n":10
+{"k":"salt","v":[{"pid":"3966960","n":4},{"pid":"3968227","n":2},{"pid":"3987197","n":4},{"pid":"4065566","n":6},{"
+{"k":"pharmaceutical","v":[{"pid":"3988473","n":10},{"pid":"4008324","n":2},{"pid":"4024266","n":10},{"pid":"402980
+{"k":"treating","v":[{"pid":"3989834","n":4},{"pid":"4031205","n":2},{"pid":"4039659","n":8},{"pid":"4054665","n":6
+{"k":"alkyl","v":[{"pid":"3956500","n":25},{"pid":"3973013","n":28},{"pid":"3984544","n":6},{"pid":"3988471","n":10
+{"k":"amino","v":[{"pid":"4061744","n":6},{"pid":"4100277","n":5},{"pid":"4335205","n":2},{"pid":"4341769","n":8},{
+```
+
+---
+
+## Filter inverted index in Python
+
+Filter criteria:
+
+- only keep words contained in at least 10 patent claims (already done)
+- only keep words contained in less than 90% of all patent claims (`factor_max`)
+
+additional criterion to limit sparse matrix size:
+
+- only keep words contained in at least 10% of all patent claims (`factor_min`)
+
+```
+import jsonlines
+
+unique_ids = 532290
+factor_min = .05
+factor_max = .9
+
+data = {}
+with jsonlines.open(fname) as reader:
+    for obj in reader.iter(type=dict, skip_invalid=True):
+    	if len(obj['v']) >= (unique_ids * factor_min) and len(obj['v']) < (unique_ids * factor_max):
+    		data[obj['k']] = obj['v']
+```
+
+---
+
+## Create sparse matrix from inverted index in Python
+
+- `data`: dictionary
+- `data.keys()`: array of unique words (`k` in JSON)
+
+```
+[u'treating',
+ u'pharmaceutical',
+ u'administering',
+ u'group',
+ u'form',
+ ...]
+```
+
+- `len(data[data.keys()[0]])`: number of patent claims containing word `data.keys()[0]`
+
+```
+import pandas as pd
+
+df = pd.DataFrame.from_dict({(i,j): data[i][j]
+                            for i in data.keys()
+                            for j in range(0, len(data[i]))},
+                            orient='index')
+
+mat = df.reset_index().pivot(index='pid',columns='level_0',values='n')
+```
+
+---
+
+```
+level_0  acid  administering  alkyl  amino  amount  carrier  composition  \
+pid                                                                        
+3930799   NaN            NaN    NaN    NaN     NaN      NaN          NaN   
+3930944   NaN            NaN    NaN    NaN     2.0      NaN          NaN   
+3930945   NaN            NaN    NaN    NaN     2.0      NaN          NaN   
+3930946   6.0            NaN    NaN    NaN     NaN      NaN          NaN   
+3930947   NaN            NaN    NaN    NaN     NaN      NaN          NaN   
+3930948   4.0            NaN    NaN    4.0     2.0      NaN          NaN   
+3930949  30.0            NaN   14.0   10.0     NaN     15.0          NaN   
+3930950   4.0            NaN    NaN    4.0     4.0      NaN          NaN   
+3930951   NaN            NaN    NaN    NaN     NaN     22.0          NaN   
+3930952  32.0            NaN    NaN    NaN     NaN      NaN          NaN   
+3930953   NaN            NaN    NaN    NaN     NaN      NaN          4.0   
+3930954   8.0            NaN    NaN    NaN     NaN      NaN          NaN   
+3930955   NaN            NaN    NaN    NaN     NaN      NaN          NaN   
+3930956   2.0            NaN    NaN    NaN     2.0      NaN          NaN   
+3930957   NaN            NaN    NaN    NaN     2.0     16.0          NaN   
+3931032   6.0            NaN    NaN    NaN     6.0      NaN         15.0   
+3931396   NaN            NaN    NaN    NaN     NaN      NaN          NaN   
+3931397  14.0            NaN    NaN    NaN     2.0      2.0         10.0   
+3931398   NaN            4.0    NaN    NaN     4.0      NaN          NaN   
+3931400   4.0            NaN    NaN    NaN     NaN      NaN          6.0   
+3931401   2.0            2.0    NaN    NaN     2.0      NaN          NaN   
+3931402   NaN            8.0    NaN    NaN     8.0      NaN         24.0   
+3931403   NaN            NaN    NaN    NaN     NaN      1.0         10.0   
+3931404   NaN            NaN    NaN    NaN     NaN      NaN          NaN   
+3931405   NaN            4.0    NaN    NaN    12.0      4.0          NaN   
+3931406   6.0            NaN    4.0    NaN     2.0      NaN          NaN   
+3931407   NaN            2.0   16.0    4.0     2.0      4.0         22.0   
+3931408   NaN            NaN    4.0    NaN     4.0      2.0          2.0   
+3931409   NaN            NaN    NaN    NaN     NaN      NaN          NaN   
+3931410   4.0            NaN    4.0    NaN     6.0      NaN          NaN   
+...       ...            ...    ...    ...     ...      ...          ...   
+```
+
+---
+class: inverse, center, middle
+
+# STI Patent Novelty
+
+        </textarea>
+        <script src="../public/js/remark.min.js">
+        </script>
+        <script>
+         var slideshow = remark.create({
+             ratio: '16:9',
+             highlightLines: true
+         });
+        </script>
+    </body>
+</html>

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+
+    <title>MarkLogic for Elsevier SCOPUS</title>
+
+    <meta name="description" content="Interactive Scientometric indicator platform using MarkLogic">
+    <meta name="author" content="Bo Werth">
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+
+    <link rel="stylesheet" href="../reveal.js/css/reveal.css">
+    <link rel="stylesheet" href="../reveal.js/css/theme/black.css" id="theme">
+
+    <!-- Code syntax highlighting -->
+    <link rel="stylesheet" href="../reveal.js/lib/css/zenburn.css">
+
+    <!-- Printing and PDF exports -->
+    <script>
+      var link = document.createElement( 'link' );
+      link.rel = 'stylesheet';
+      link.type = 'text/css';
+      link.href = window.location.search.match( /print-pdf/gi ) ? '../reveal.js/css/print/pdf.css' : '../reveal.js/css/print/paper.css';
+      document.getElementsByTagName( 'head' )[0].appendChild( link );
+    </script>
+
+    <!--[if lt IE 9]>
+	<script src="../reveal.js/lib/js/html5shiv.js"></script>
+	<![endif]-->
+  </head>
+
+  <body>
+
+    <div class="reveal">
+
+      <div class="slides">
+	<section>
+	  <h1>MarkLogic</h1>
+	  <!-- <h3>NoSQL for Scientometrics</h3> -->
+	  <h3>NoSQL Database for Scientific Publications</h3>
+	  <p>Feasibility Study</p>
+	  <p><small><a href="mailto:bo.werth@oecd.org">Bo Werth, STI/EAS</a></small></p>
+	</section>
+
+	<section>
+	  <section>
+	    <h2>Publication Databases</h2>
+	    <h3>Springer</h3>
+	    <p>
+	      <a href="http://link.springer.com">link.springer.com</a>
+	    </p>
+	    <h3>Elsevier</h3>
+	    <p>
+	      <a href="http://www.sciencedirect.com">sciencedirect.com</a>
+	    </p>
+	    <p>
+	      <a href="http://www.elsevier.com/solutions/scopus">Scopus</a>
+	    </p>
+	  </section>
+	  <section>
+	    <h2>Elsevier Scopus</h2>
+	    <!-- <p> -->
+	    <li>abstract and citation database of peer-reviewed literature</li>
+	    <li>scientific journals, books and conference proceedings</li>
+	    <li>comprehensive overview of the world's research output</li>
+	    <li>science & technology, medicine, social sciences, arts & humanities</li>
+	    <li>smart tools to track, analyze and visualize research</li>
+	    <!-- </p> -->
+	  </section>
+	  <section>
+	    <h2>Scopus Custom Data</h2>
+	    <li>Time: 1996-2013</li>
+	    <li>Size: ~200GB per year,<br> total: more than 1.3 GB decompressed</li>
+	    <h3>Data Format</h3>
+	    <li>batches of 10.000 pgp encrypted, compressed archives</li>
+	    <li>separate XML files for article and reverse citations</li>
+	    <li>article file contains approx. 450 fields</li>
+	  </section>
+
+	  <section>
+	    <h2>Indicator Derivation</h2>
+	    <p>
+	      Elsevier <a href="http://www.elsevier.com/solutions/scival">SciVal</a>
+	    </p>
+	    <p>
+	      <img data-src="./assets/SciVal-Alpha-Diagram_v6.jpg" alt="Down arrow">
+	    </p>
+	  </section>
+	  
+	</section>
+
+	<section>
+
+	  <!-- <section> -->
+	  <!--   <h2>SQL Architecture</h2> -->
+	  <!--   <p> -->
+	  <!--     <li>map XML fields to table columns</li> -->
+	  <!--     <li>set of primary keys</li> -->
+	  <!--     <li>abstracts in single column</li> -->
+	  <!--   </p> -->
+	  <!-- </section> -->
+
+	  <section>
+	    <h2>MarkLogic</h2>
+	    <li>"Any Structure", schema-agnostic, no pre-defined model</li>
+	    <li>Query Console <a href="http://localhost:8000/qconsole/">http://localhost:8000/qconsole/</a></li>
+	    <li>System Summary <a href="http://localhost:8001/">http://localhost:8001/</a></li>
+	    <li>MarkLogic REST Server <a href="http://localhost:8100/">http://localhost:8100/</a></li>
+	  </section>
+
+	  <section>
+	    <!-- <h2>ML Setup</h2> -->
+	    <h2>Getting Started</h2>
+	    <h3>JSON</h3>
+	    <li><a href="https://github.com/marklogic/marklogic-samplestack">https://github.com/marklogic/marklogic-samplestack</a></li>
+	    <h3>XML</h3>
+	    <li><a href="https://github.com/rjrudin/ml-gradle">https://github.com/rjrudin/ml-gradle</a></li>
+	    <pre><code>gradle importSampleData</code></pre>
+	  </section>
+	  
+	  <section>
+	    <h3>Query Console</h3>
+	    <img data-src="./assets/ml-query-console-8000.png" alt="ML Query Console 8000">
+	  </section>
+	  
+	  <section>
+	    <h3>System Summary</h3>
+	    <img data-src="./assets/ml-admin-8001-sample-project-content-forests.png" alt="ML Admin 8001, sample project content, forests">
+	  </section>
+
+	  <section>
+	    <h3>REST Server</h3>
+	    <img data-src="./assets/ml-rest-server-8100.png" alt="ML REST Server 8100">
+	  </section>
+
+	  <section>
+	    <p>
+	      http://localhost:8100/v1/search?q=OECD&start=1&pageLength=5
+	    </p>
+	    <img data-src="./assets/ml-rest-server-example-search.png" alt="ML REST Server example search">
+	  </section>
+	  
+	</section>
+
+	<section>
+	  
+	  <section>
+	    <h2>R Shiny User Interface</h2>
+	    <li>create query URL based on user inputs</li>
+	    <li>create text string for each match in parsed JSON results</li>
+	    
+	    <!-- shiny::runApp(file.path(dbpath, "GitHub", "scopusBrowser", "inst", "scopusBrowser"), launch.browser = FALSE, port = 7878) -->
+	    <!-- <pre><code>shiny::runApp("scopusBrowser")</code></pre> -->
+	    <!-- <li>visit <a href="http://localhost:7878">http://localhost:7878</a></li> -->
+	    <!-- <h3>query ML REST API</h3> -->
+	    <!-- <pre><code>http://localhost:8100/v1/search?q=...&pageLength=...&format=json</code></pre> -->
+	  <!-- </section> -->
+
+	  <!-- <section> -->
+	  <pre><code>  .search_result <- reactive({
+    url <- paste0('http://localhost:8100/v1/search?q=', input$search_text,
+                  '&pageLength=', input$search_pagelength, '&format=json')
+    tt <- getURL(url, userpwd="admin:admin")
+    result_df <- fromJSON(tt)$results
+    search_result <- sapply(result_df$matches, function(x) toString(unlist(x[["match-text"]])))
+    names(search_result) <- unname(sapply(result_df$uri, basename))
+    return(search_result)
+  })</code></pre>  
+	  </section>
+	  
+	  <section>
+	    <h2><a href="https://github.com/kbenoit/quanteda">quanteda</a></h2>
+	    <p>R functions for Quantitative Analysis of Textual Data</p>
+	    <li>create corpus containing the document level information</li>
+	    <li>dfm creates a document-feature matrix</li>
+	    <li>topfeatures returns a list of words sorted by frequency</li>
+	    
+	  </section>
+	  
+	  <section>
+	    <h3>R Shiny UI: word cloud, word count</h3>
+	    <img data-src="./assets/shiny-example-word-cloud.png" alt="Shiny example word cloud">
+	  </section>
+
+	</section>
+
+	<section
+
+	   <section>
+	    <h2>NoSQL open-source</h2>
+	    <li><a href="http://exist-db.org">eXistdb</a></li>
+	    <li><a href="http://www.mongodb.org">MongoDB</a></li>
+	    <li><a href="http://couchdb.apache.org">Apache CouchDB</a></li>
+	  </section>
+
+	</section>
+	  
+      </div>
+
+    </div>
+
+    <script src="../reveal.js/lib/js/head.min.js"></script>
+    <script src="../reveal.js/js/reveal.js"></script>
+
+    <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+      controls: true,
+      progress: true,
+      history: true,
+      center: true,
+
+      transition: 'slide', // none/fade/slide/convex/concave/zoom
+
+      // Optional reveal.js plugins
+      dependencies: [
+      { src: '../reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+      { src: '../reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: '../reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+      { src: '../reveal.js/plugin/highlight/highlight.js', async: true, condition: function() { return !!document.querySelector( 'pre code' ); }, callback: function() { hljs.initHighlightingOnLoad(); } },
+      { src: '../reveal.js/plugin/zoom-js/zoom.js', async: true },
+      { src: '../reveal.js/plugin/notes/notes.js', async: true }
+      ]
+      });
+
+    </script>
+
+  </body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<title>SDMX PLAY APPLICATION</title>
+<meta name="author" content="(Bo Werth)"/>
+<style type="text/css">
+.underline { text-decoration: underline; }
+</style>
+<link rel="stylesheet" href="../reveal.js/css/reveal.css"/>
+
+<link rel="stylesheet" href="../reveal.js/css/theme/black.css" id="theme"/>
+
+<link rel="stylesheet" href="./local.css"/>
+
+<!-- If the query includes 'print-pdf', include the PDF print sheet -->
+<script>
+    if( window.location.search.match( /print-pdf/gi ) ) {
+        var link = document.createElement( 'link' );
+        link.rel = 'stylesheet';
+        link.type = 'text/css';
+        link.href = '../reveal.js/css/print/pdf.css';
+        document.getElementsByTagName( 'head' )[0].appendChild( link );
+    }
+</script>
+<meta name="description" content="sdmxPlay Introduction.">
+</head>
+<body>
+<div class="reveal">
+<div class="slides">
+
+<section>
+<section id="slide-org7308be9">
+<h2 id="org7308be9">SDMX PLAY APPLICATION</h2>
+<p>
+User interface to Java SDMX Connectors
+</p>
+
+<p>
+<a href="http://sdmx.rdata.work">sdmx.rdata.work</a>
+</p>
+
+<p>
+Scala source: <a href="http://github.com/bowerth/sdmxPlay">sdmxPlay</a>
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orgef07eb5">
+<h3 id="orgef07eb5">Summary</h3>
+<p>
+This application retrieves time series available from SDMX APIs. The SDMX
+query can either be specified through the user interface or by modification
+of the URL. 
+</p>
+
+<p>
+The SDMX provider is henceforth contacted with the query and in
+case of existing time series returns information transformed into a
+JavaScript data format for display and download.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-org35f378d">
+<h3 id="org35f378d">Usage</h3>
+<ul>
+<li>modify <b>Provider Code</b> form field (default: <code>UIS</code>)</li>
+<li>modify <b>Query</b> form field: <code>FF.*.*.US+FR._T._T._T._T._T._T.EXHIB._T</code></li>
+<li>click <code>Submit</code></li>
+<li>click <code>Download CSV</code></li>
+
+</ul>
+
+</section>
+<section id="slide-orgc6c60d2">
+<h4 id="orgc6c60d2">Provider</h4>
+<p>
+Valid provider codes can be retrieved using the <code>List Providers</code> button.
+Please refer to the underlying SDMX Connectors linked at the bottom of the
+page for additional information.
+</p>
+
+</section>
+<section id="slide-org62dd06c">
+<h4 id="org62dd06c">Query</h4>
+<p>
+Enter a valid SDMX query where the format is depending on the data flow:
+<code>[FLOW . ] FREQ . CURRENCY . CURRENCY_DENOM . EXR_TYPE . EXR_SUFFIX</code>. The
+dimensions of a flow can be retrieved using the 'List Dimensions' button.
+</p>
+
+<p>
+E.g. to retrieve the dimensions of AMECO flow by ECB, simply replace 'EXR'
+in the Query field with 'AMECO' and click 'List Dimensions'. If interested
+in all members for one or more dimension, use <code>*</code> e.g. <code>EXR.A.*.EUR.SP00.A</code>
+returns all available currencies in the flow, currently 44.
+</p>
+
+</section>
+<section id="slide-orge096fd5">
+<h4 id="orge096fd5">Download</h4>
+<p>
+Returns a csv file with time series in columns. The first column contains
+the date information in ascending order. When opened with spreadsheet
+programs (e.g. gnumeric or LibreOffice Calc), a line chart can be generated
+with ease.
+</p>
+
+</section>
+</section>
+<section>
+<section id="slide-orgc41c623">
+<h2 id="orgc41c623">References</h2>
+<ul>
+<li>SDMX Connectors: <a href="https://github.com/amattioc/SDMX">amattioc/SDMX</a></li>
+
+</ul>
+</section>
+</section>
+</div>
+</div>
+<p> Created by rdata. </p>
+<script src="../reveal.js/lib/js/head.min.js"></script>
+<script src="../reveal.js/js/reveal.js"></script>
+
+<script>
+// Full list of configuration options available here:
+// https://github.com/hakimel/reveal.js#configuration
+Reveal.initialize({
+
+controls: true,
+progress: true,
+history: false,
+center: true,
+slideNumber: 'c',
+rollingLinks: true,
+keyboard: true,
+overview: true,
+width: 1200,
+height: 800,
+margin: 0.10,
+minScale: 0.50,
+maxScale: 2.50,
+
+theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
+transition: Reveal.getQueryHash().transition || 'linear', // default/cube/page/concave/zoom/linear/fade/none
+transitionSpeed: 'default',
+multiplex: {
+    secret: '', // null if client
+    id: '', // id, obtained from socket.io server
+    url: '' // Location of socket.io server
+},
+
+// Optional libraries used to extend on reveal.js
+dependencies: [
+ { src: '../reveal.js/plugin/markdown/marked.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: '../reveal.js/plugin/markdown/markdown.js', condition: function() { return !!document.querySelector( '[data-markdown]' ); } },
+ { src: '../reveal.js/plugin/notes/notes.js', async: true, condition: function() { return !!document.body.classList; } }]
+});
+</script>
+</body>
+</html>

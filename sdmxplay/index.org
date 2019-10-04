@@ -1,0 +1,70 @@
+#+Title: SDMX PLAY APPLICATION
+
+#+OPTIONS: reveal_center:t reveal_progress:t reveal_history:nil reveal_control:t
+#+OPTIONS: reveal_rolling_links:t reveal_keyboard:t reveal_overview:t num:nil
+#+OPTIONS: reveal_width:1200 reveal_height:800
+#+OPTIONS: reveal_title_slide:nil
+#+OPTIONS: toc:0
+#+REVEAL_MARGIN: 0.1
+#+REVEAL_MIN_SCALE: 0.5
+#+REVEAL_MAX_SCALE: 2.5
+#+REVEAL_TRANS: linear
+#+REVEAL_THEME: black
+#+REVEAL_HLEVEL: 2
+#+REVEAL_HEAD_PREAMBLE: <meta name="description" content="sdmxPlay Introduction.">
+#+REVEAL_POSTAMBLE: <p> Created by rdata. </p>
+#+REVEAL_PLUGINS: (markdown notes)
+#+REVEAL_EXTRA_CSS: ./local.css
+
+* SDMX PLAY APPLICATION
+
+  User interface to Java SDMX Connectors
+
+  [[http://sdmx.rdata.work][sdmx.rdata.work]]
+
+  Scala source: [[http://github.com/bowerth/sdmxPlay][sdmxPlay]]
+
+** Summary
+
+   This application retrieves time series available from SDMX APIs. The SDMX
+   query can either be specified through the user interface or by modification
+   of the URL. 
+
+   The SDMX provider is henceforth contacted with the query and in
+   case of existing time series returns information transformed into a
+   JavaScript data format for display and download.
+
+** Usage
+
+   - modify *Provider Code* form field (default: ~UIS~)
+   - modify *Query* form field: ~FF.*.*.US+FR._T._T._T._T._T._T.EXHIB._T~
+   - click ~Submit~
+   - click ~Download CSV~
+
+*** Provider
+    
+    Valid provider codes can be retrieved using the ~List Providers~ button.
+    Please refer to the underlying SDMX Connectors linked at the bottom of the
+    page for additional information.
+
+*** Query
+
+    Enter a valid SDMX query where the format is depending on the data flow:
+    ~[FLOW . ] FREQ . CURRENCY . CURRENCY_DENOM . EXR_TYPE . EXR_SUFFIX~. The
+    dimensions of a flow can be retrieved using the 'List Dimensions' button.
+    
+    E.g. to retrieve the dimensions of AMECO flow by ECB, simply replace 'EXR'
+    in the Query field with 'AMECO' and click 'List Dimensions'. If interested
+    in all members for one or more dimension, use ~*~ e.g. ~EXR.A.*.EUR.SP00.A~
+    returns all available currencies in the flow, currently 44.
+
+*** Download
+
+    Returns a csv file with time series in columns. The first column contains
+    the date information in ascending order. When opened with spreadsheet
+    programs (e.g. gnumeric or LibreOffice Calc), a line chart can be generated
+    with ease.
+
+* References
+
+  - SDMX Connectors: [[https://github.com/amattioc/SDMX][amattioc/SDMX]]

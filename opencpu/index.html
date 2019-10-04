@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>OpenCPU</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../public/css/example.css" />
+        <style>
+         @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+         @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+         @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+         body { font-family: 'Droid Serif'; }
+         h1, h2, h3 {
+             font-family: 'Yanone Kaffeesatz';
+             font-weight: normal;
+         }
+         .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+        </style>
+    </head>
+    <body>
+        <textarea id="source">
+
+class: inverse, center, middle
+
+# FAO SWS
+
+https://sdlc.fao.org/bitbucket/scm/sws/faosws.git
+
+## Food Balance Sheets (FBS)
+
+https://github.com/SWS-Methodology/
+
+http://fbs.rdata.work/
+
+---
+
+## Architecture and User Roles
+
+.center[![](assets/sws-architecture.png)]
+
+---
+
+## DevOps Pipeline
+
+.center[![](assets/jenkins_process.png)]
+
+---
+class: inverse, center, middle
+
+# FAO SWS UI
+
+https://sws.gitbook.io/statistical-working-system-r-guide/
+
+---
+
+Module Upload
+
+.center[![](assets/faosws/01-r-plugins-button.png)]
+
+---
+
+Module Management
+
+.center[![](assets/faosws/02-upload-zip-file.png)]
+
+---
+
+Session Management
+
+.center[![](assets/faosws/03-new-session-button.png)]
+
+---
+
+Session Management
+
+.center[![](assets/faosws/04-select-keys.png)]
+
+---
+
+Session Management
+
+.center[![](assets/faosws/05-edit-session-name.png)]
+
+---
+
+Module Execution
+
+.center[![](assets/faosws/06-r-plugin-execution-annotated.png)]
+
+---
+
+Module Execution
+
+.center[![](assets/faosws/07-session-r-plugins-button.png)]
+
+---
+class: inverse, center, middle
+
+# FAO SWS Details
+
+---
+
+## General Information
+
+- Motivation
+  - Production of statistics: reduce cost and standardize methodology
+  - Food Balance Sheets (FBS): need to reduce recurrent consultant costs
+  - REST API for remote development and maintenance
+
+- Project characteristics
+  - Start date: 2011
+  - Maturity: under construction
+  - Roadmap:
+  - Cost/Benefit:
+
+- Project team
+  - IT infrastructure: Java, JavaScript, SQL DB Admin
+  - Developers (remote): R programming (ml4, S4), VCS (git)
+  - Management
+
+---
+
+## Architecture & Performance
+
+- Architecture
+  - Test / Production Systems
+  - Frontend: Wildfly
+  - Backend: REST API -> Java -> Rserve, PostgreSQL DB
+  - Data sources managed by infrastructure team (JIRA)
+
+- I/O Performance
+  - Instantaneous for small data sets and simple modules
+  - Data-intensive procedures: slow read/write due to security measures
+
+- CPU Performance
+
+  - No Multicore processing: parallel computation through scheduled execution
+  - Parallel execution CPU and memory usage http://fbs.rdata.work/performance/
+
+---
+
+## Sessions, R Modules, Data
+
+- Sessions
+  - Unique environment with mutable status
+  - Session token (hash)
+  - Non-concurrent access and modification by different users
+  - User authorisation
+
+- R Modules
+  - 'Modules' (batch scripts with configuration) created by R users in the form of packages
+  - User packages pushed to public GitHub using tags
+  - User package compilation triggered by github hooks using Jenkins
+
+- Data
+  - Data serialised (JSON) for transfer through REST API
+  - Worldwide access (developer mobility, breached)
+  - Data integrity: no overwriting, keeping history, read/write permission check
+  - Transfer speed: approx. 30 min for 2GB Trade Data
+
+---
+class: inverse, center, middle
+
+# Remote R computing
+
+OpenCPU, Rserve, plumber
+
+---
+class: inverse, center, middle
+
+# Rserve
+
+https://www.rforge.net/Rserve/
+
+---
+
+.center[![](assets/rserve-1-earl-2014.png)]
+
+Source: https://www.slideshare.net/sellorm/cloud-computing-grid-computing-and-docker
+
+---
+
+.center[![](assets/rserve-2-earl-2014.png)]
+
+---
+
+.center[![](assets/rserve-3-earl-2014.png)]
+
+---
+class: inverse, center, middle
+
+# SAP HANA
+
+[R Integration](https://help.sap.com/viewer/a78d7f701c3341339fafe4031b64f015/2.0.01/en-US)
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/sap-logo.png)]
+
+## SAP HANA
+
+### R Integration
+
+- [SAP HANA R Integration Guide](https://help.sap.com/viewer/a78d7f701c3341339fafe4031b64f015/2.0.01/en-US)
+]
+
+.right-column[
+#### SAP HANA Platform 2.0 SPS 01
+
+.left[![](assets/sap-rclient.png)]
+]
+
+---
+class: inverse, center, middle
+
+# OpenCPU
+
+https://www.opencpu.org/
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/opencpu-square.png)]
+
+## OpenCPU
+
+### Scalable R Services
+
+- [opencpu.org](https://www.opencpu.org/)
+]
+
+.right-column[
+#### Release OpenCPU 2.1 November 22, 2018
+
+.left[![](assets/opencpu-http-methods.png)]
+]
+
+---
+class: inverse, center, middle
+
+# plumber
+
+https://www.rplumber.io
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/plumber.png)]
+
+## Plumber
+
+### web API
+
+- [rplumber.io](https://www.rplumber.io)
+]
+
+.right-column[
+#### Example
+
+- An R package that converts your existing R code to a web API using a handful of special one-line comments.
+
+.left[![](assets/plumber-example.png)]
+]
+
+        </textarea>
+        <script src="../public/js/remark.min.js">
+        </script>
+        <script>
+         var slideshow = remark.create({
+             ratio: '16:9',
+             highlightLines: true
+         });
+        </script>
+    </body>
+</html>

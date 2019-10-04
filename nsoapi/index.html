@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>NSO API</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../public/css/example.css" />
+        <style>
+         @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+         @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+         @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+         body { font-family: 'Droid Serif'; }
+         h1, h2, h3 {
+             font-family: 'Yanone Kaffeesatz';
+             font-weight: normal;
+         }
+         .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+        </style>
+    </head>
+    <body>
+        <textarea id="source">
+
+class: inverse, center, middle
+
+# nsoApi
+
+http://rdata.work/nsoApi/
+
+---
+
+.center[![provider logos](assets/collage.png)]
+
+---
+
+Package Vignette http://rdata.work/nsoApi/articles/nsoApi.html
+
+.center[![](assets/screenshot-vignette-2.png)]
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/bea-final-logo-blue-backing.png)]
+
+## BEA
+
+### Bureau of Economic Analysis
+
+- REST, NDJSON
+- ~450 datasets
+- registration
+- two decimals
+- [list of tables](https://bowerth.gitbooks.io/opendata-tables/content/mdtable/content/bea_tables.html)
+- [documentation](http://www.bea.gov/api/data/?)
+]
+
+.right-column[
+#### Example
+
+- NIPA, 272, Table 7.2.5B. Motor Vehicle Output (A) (Q)
+
+.left[![](assets/bea-bar.svg)]
+]
+
+---
+class: middle
+
+.left-column[
+.left[![destatis logo](assets/AmtsLogo.png)]
+
+## Genesis
+
+### Statistisches Bundesamt
+
+- REST, JSON, CSV
+- ~2300 datasets
+- 50-500 EUR p.a.
+- [list of tables](https://bowerth.gitbooks.io/opendata-tables/content/mdtable/content/genesis_tables.html)
+- [documentation](https://www-genesis.destatis.de/genesis/online;jsessionid=F28B431CACF4A285DD2646A7EF76F446.tomcat_GO_2_1?Menu=Webservice)
+]
+
+.right-column[
+#### Example
+
+- 73421BJ001, Biersteuer-, Schaumweinsteuerstatistik, Deutschland insgesamt, Jahr
+
+.left[![](assets/genesis-radar.svg)]
+]
+
+---
+class: middle
+
+.left-column[
+.left[![destatis logo](assets/cbs-brand.png)]
+
+## CBS
+
+### Statistics Netherlands
+
+- OData
+- ~3000 NL
+- ~700 EN
+- [list of tables](https://bowerth.gitbooks.io/opendata-tables/content/mdtable/content/cbs_tables.html)
+- [documentation](https://www.cbs.nl/en-gb/our-services/open-data)
+]
+
+.right-column[
+#### Example
+
+- 7425eng, Milk supply and dairy production, January 1995 - May 2015, Monthly
+
+.left[![](assets/cbs-area.svg)]
+]
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/logo_data_gv_at_ogd_open_government_data.png)]
+
+## data.gv.at
+
+### Statistics Austria
+
+- CSV, JSON
+- ~40 datasets
+- [list of datasets](https://www.data.gv.at/katalog/feeds/custom.atom?organization=statistik-austria)
+- [documentation](http://data.statistik.gv.at)
+]
+
+.right-column[
+#### Example
+
+- OGD_f1531neu_Aussenhandel_1, Foreign Trade, Annual, 2007-2016, Top 6
+
+.left[![](assets/statat-bar.svg)]
+]
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/sig-blk-en-2.svg)]
+
+## CANSIM
+
+### Statistics Canada
+
+- SOAP, XML
+- iso-8859-1 encoding
+- [documentation](http://data.statistik.gv.at)
+- [bcgov/CANSIM-data-viewer](https://github.com/bcgov/CANSIM-data-viewer)
+]
+
+.right-column[
+
+#### Example
+
+- http://www.statcan.gc.ca/pub/75-006-x/2017001/article/14826-eng.htm
+
+.left[![](assets/statcan-twitter-4-col.jpg)]
+]
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/logo_en.png)]
+
+## Databank
+
+### Statistics Denmark
+
+- JSON, XML
+- ~1600 datasets
+- [list of tables](https://bowerth.gitbooks.io/opendata-tables/content/mdtable/content/statbank_tables.html)
+- [documentation](http://www.dst.dk/da/Statistik/statistikbanken/api)
+- [rOpenGov/dkstat](https://github.com/rOpenGov/dkstat)
+]
+
+.right-column[
+#### Example
+
+- CAMP1, Nights spent on camping sites, 1992-2017
+
+.left[![](assets/databank-bar.svg)]
+]
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/SCB-logo_eng.png)]
+
+## SCB
+
+### Statistics Sweden
+
+- PX-Web
+- ~1500 datasets
+- [list of tables](https://bowerth.gitbooks.io/opendata-tables/content/mdtable/content/scb_tables.html)
+- [documentation](http://www.scb.se/Grupp/OmSCB/API/API-description.pdf)
+- [rOpenGov/pxweb](https://github.com/rOpenGov/pxweb)
+]
+
+.right-column[
+#### Example
+
+- Internet use in leisure time by how often,level of education and sex
+
+.left[![](assets/scb-bar-2.svg)]
+]
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/SSB_logo.png)]
+
+## SSB
+
+### Statistics Norway
+
+- PX-Web
+- ~6000 datasets
+- [list of tables](https://bowerth.gitbooks.io/opendata-tables/content/mdtable/content/ssb_tables.html)
+- [documentation](http://www.ssb.no/en/omssb/tjenester-og-verktoy/api/px-api/_attachment/248250?_ts=1559219c7b8)
+]
+
+.right-column[
+#### Example
+
+- 07696: Daily snuff users and occasional snuff users, by sex and education level (per cent) 2008 - 2015
+
+.left[![](assets/ssb-bar.svg)]
+]
+
+---
+class: middle
+
+.left-column[
+.left[![](assets/tklogo_en.png)]
+
+## PXNET2
+
+### Statistics Finland
+
+- JSON
+- ~1000 datasets
+- [list of tables](https://bowerth.gitbooks.io/opendata-tables/content/mdtable/content/pxnet2_tables.html)
+- [documentation](http://pxnet2.stat.fi/PXWeb/pxweb/en/StatFin/StatFin__kan__vtp/?tablelist=true)
+- [rOpenGov/pxweb](https://github.com/rOpenGov/pxweb)
+]
+
+.right-column[
+#### Example
+
+- [blocks.org: Finnish Labor Market](http://bl.ocks.org/badosa/81ab0e82138199d7e166)
+
+.left[![](assets/finnish-labor-market-2.png)]
+]
+
+---
+class: middle
+
+.left-column[
+
+## nsoApi Browser
+
+### Shiny by RStudio
+
+- query datasets
+- build query
+- DT widget
+- dygraph plot
+- download csv
+]
+
+.right-column[
+- http://github.com/bowerth/nsoApiBrowser
+
+.left[![](assets/nsoApiBrowser.png)]
+]
+
+---
+class: inverse, center, middle
+
+# SDMX
+
+---
+class: middle
+
+.left-column[
+
+## SDMX Browser
+
+### Scala Play Framework
+
+- EUROSTAT
+- ECB
+- IMF
+- ABS
+- NBB
+- INEGI
+- INSEE
+- OECD
+- [amattioc/SDMX](https://github.com/amattioc/SDMX)
+- [bowerth/sdmxPlay](https://github.com/bowerth/sdmxPlay)
+]
+
+.right-column[
+- http://sdmx.rdata.work
+
+.left[![](assets/sdmxPlay.png)]
+]
+
+
+        </textarea>
+        <script src="../public/js/remark.min.js">
+        </script>
+        <script>
+         var slideshow = remark.create({
+             ratio: '16:9',
+             highlightLines: true
+         });
+        </script>
+    </body>
+</html>

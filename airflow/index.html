@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Apache Airflow</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../public/css/example.css" />
+        <style>
+         @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+         @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+         @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+         body { font-family: 'Droid Serif'; }
+         h1, h2, h3 {
+             font-family: 'Yanone Kaffeesatz';
+             font-weight: normal;
+         }
+         .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+        </style>
+    </head>
+    <body>
+        <textarea id="source">
+
+class: inverse, middle
+background-size: 50%
+background-image: url(assets/logos/airflow_960x560_transparent.png)
+
+.logo[![](assets/r4io-logo-small.png)]
+
+.company[R4IO]
+
+.date[Paris, 04/10/2019]
+
+---
+
+## What is Airflow
+
+- a platform to programmatically author, schedule and monitor workflows
+- related platforms for job scheduling: Oozie, Azkabhan, Luigi
+- [The rise of the data engineer](https://www.freecodecamp.org/news/the-rise-of-the-data-engineer-91be18f1e603/) by Maxime Beauchemin, Airflow creator
+  - code allows for arbitrary levels of abstractions
+  - allows for all logical operations in a familiar way
+  - integrates well with source control
+  - is easy to version and to collaborate on
+
+---
+
+## Architecture
+
+.center[![Architecture Workers](assets/architecture-workers.png)]
+
+---
+
+## DAGs
+
+- `DAG` (Directed Acyclic Graph): collection of all the tasks you want to run, organized in a way that reflects their relationships and dependencies.
+
+.center[![Dags](assets/dags.png)]
+
+---
+
+## DAGs - Graph view
+
+simple DAG example: three tasks A, B, and C
+- A has to run successfully before B can run
+- C can run anytime
+- task A times out after 5 minutes
+- B can be restarted up to 5 times in case it fails
+- the workflow will run every night at 10pm
+- the workflow shouldn't start until a certain date.
+
+.center[![DAG Tree](assets/graph.png)]
+
+---
+
+## DAGs - Parallel example
+
+- tasks can run independently from each other, benefitting from parallel computation (e.g. using celery workers). 
+- the next task will only start when all upstream tasks have been completed.
+
+.center[![Subdag After](assets/subdag_after.png)]
+
+.center[![Subdag Before](assets/subdag_before.png)]
+
+---
+
+## DAGs - Scheduler
+
+.center[![Scheduler Loop](assets/scheduler_loop.jpg)]
+
+---
+
+## DAGs - Task lifecycle
+
+.center[![Task Lifecycle](assets/task_lifecycle.png)]
+
+.center[![DAG Tree](assets/tree.png)]
+
+---
+
+## DAGs - Code
+
+DAGs use Python, as Airflow does
+
+.center[![DAG Code](assets/code.png)]
+
+---
+
+## DAGs - BashOperator function reference
+
+.center[![Bash Operator](assets/bash_operator.png)]
+
+---
+
+## DAGs - BashOperator example
+
+```
+t1 = BashOperator(
+    task_id='exportproductreports',
+    bash_command='java -cp target/scala-2.12/sis3-assembly-0.1.jar sis3.export.ExportPageSize exportproductreports',
+    dag=dag)
+
+t21 = BashOperator(
+    task_id='exportcases',
+    bash_command='java -cp target/scala-2.12/sis3-assembly-0.1.jar sis3.export.ExportPageSize exportcases',
+    dag=dag)
+
+t22 = BashOperator(
+    task_id='extractcases',
+    bash_command='java -cp target/scala-2.12/sis3-assembly-0.1.jar sis3.extract.ExtractElasticsearch exportcases',
+    dag=dag)
+
+t3 = BashOperator(
+    task_id='exportappointments',
+    bash_command='java -cp target/scala-2.12/sis3-assembly-0.1.jar sis3.export.ExportPageSize exportappointments',
+    dag=dag)
+
+
+t22.set_upstream(t21)
+```
+
+---
+
+## DAGs - Single-worker execution
+
+.center[![Gantt sis3-ws](assets/gantt-sis3-ws.png)]
+
+.center[![Graph sis3-ws](assets/graph-sis3-ws.png)]
+
+---
+
+## Configuration (single-node)
+
+- MariaDB: create DB, user
+- `apache-airflow[mysql,password]`
+- Setup password using Python
+- Edit `/etc/my.cnf.d/server.cnf`
+- Systemd: set env variables for airflow user in `/etc/sysconfig/airflow`
+- Copy `*.service` files to `/usr/lib/systemd/system`
+- `useradd`, `groupadd` ("airflow"), file system owner (`chown`)
+- Limit size of journal in `/etc/systemd/journald.conf`
+- Create "discard filter" with `rsyslog`
+
+---
+
+## Summary
+
+- Based on DAGs representation (flexible through program code)
+- No information is shared between tasks
+- Parallel execution where possible
+- Data at rest between operations
+- Executor manages distributed execution
+- Scheduler: "set it and forget it"
+- UI: monitor executions, interact with running tasks
+
+Source: [Data pipelines, Luigi, Airflow: everything you need to know](https://towardsdatascience.com/data-pipelines-luigi-airflow-everything-you-need-to-know-18dc741449b7)
+
+### Links
+
+- [10 Benefits to using Airflow](https://medium.com/analytics-and-data/10-benefits-to-using-airflow-33d312537bae)
+- [How Apache Airflow Distributes Jobs on Celery workers](https://blog.sicara.com/using-airflow-with-celery-workers-54cb5212d405)
+- [2019-Apache_Airflow_Documentation_1.10.3.pdf](http://srv01qmsyst1/slides/airflow/docs/2019-Apache_Airflow_Documentation_1.10.3.pdf)
+
+### Make
+
+- https://www.gnu.org/software/make/
+- https://www.gnu.org/software/automake/
+- https://github.com/mozilla/pymake
+- https://github.com/tqdm/py-make
+- https://bitbucket.org/saudalwasly/pymake2/src/default/
+- https://github.com/benfogle/python-gnumake
+
+---
+class: inverse, center, middle
+
+        </textarea>
+        <script src="../public/js/remark.min.js">
+        </script>
+        <script>
+         var slideshow = remark.create({
+             ratio: '16:9',
+             highlightLines: true
+         });
+        </script>
+    </body>
+</html>
