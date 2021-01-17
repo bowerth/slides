@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Apache Airflow</title>
+        <meta charset="utf-8">
+        <link rel="stylesheet" href="../public/css/example.css" />
+        <style>
+         @import url(https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz);
+         @import url(https://fonts.googleapis.com/css?family=Droid+Serif:400,700,400italic);
+         @import url(https://fonts.googleapis.com/css?family=Ubuntu+Mono:400,700,400italic);
+
+         /*body { font-family: 'Droid Serif'; }*/
+         body { font-family: 'Roboto', sans-serif; }
+         h1, h2, h3 {
+             font-family: 'Yanone Kaffeesatz';
+             font-weight: normal;
+         }
+         .remark-code, .remark-inline-code { font-family: 'Ubuntu Mono'; }
+        </style>
+    </head>
+    <body>
+        <textarea id="source">
+
+class: inverse, middle
+background-size: 50%
+
+# Automated production of Fisheries Country Notes
+
+.center[![](assets/titlepage-part-wide.jpg)]
+
+<!-- .logo[![](assets/r4io-logo-small.png)] -->
+
+.company[Bo Werth, R4IO]
+
+.date[Paris, 01/19/2021]
+
+---
+
+## Project Phases
+
+- June 2019: analysis of requirements
+- December 2019: initial data structure on .Stat
+- February 2020: creation of draft version
+- September 2020: major revisions of template and data structure
+- December 2020: final version
+
+### Project Team
+
+- Claire Delpeuch, Karine Lepron, Fabiana Cerasa, Eric Espinasse, Bo Werth
+- Q3 2020: Will Symes
+
+### Time Accounting R4IO
+
+- Intial planned working time: 10 + 3 days (ONE Author compliant Word output)
+- Effective working time: 2-3 times higher, mainly owed to changes to template and gaps in data coverage
+
+---
+
+## Data Sources
+
+- LimeSurvey
+  - key_management
+  - country_chapter
+- public .Stat
+  - FISH_AQUA
+  - FISH_LAND
+  - FISH_FLEET
+  - FISH_EMPL
+- internal Dotstat
+  - FISH_INDICATORS
+  - FISH_FSE_INDICATORS
+
+---
+
+## Templates and Outputs
+
+Client input:
+
+- Document with comments (Word)
+- Tables describing data sources for plots and inline text (Excel)
+- Country-plot matrix to adjust for timeliness of data sources (CSV)
+- Country-specific analyist comments (YAML)
+
+Output documents:
+
+- Data coverage table
+- Export of LimeSurvey contents
+- Word document compliant with ONE Author (using custom styles in Pandoc)
+- PDF document replicating format of client template
+
+---
+
+## Code Structure
+
+- configuration
+- download raw data
+- clean data
+- 5 functions for each plot:
+  - data coverage
+  - data filtering and transformation
+  - labels for plot
+  - inline text
+  - ggplot
+- helper functions
+- report (Rnw for PDF, Rmd for Word)
+
+---
+
+## Automation
+
+- objective: create report for list of countries
+- master configuration file: plot configuration, SDMX data download specification
+- download from .Stat and LimeSurvey (modify source code of `limer` R package to work with SAML)
+- pre-fill country-plot matrix to account for gaps in data coverage (timeliness, geography, variables)
+- use [GNU Make](https://www.gnu.org/software/make) to update all downstream dependencies after modification
+
+```
+download_fish_sdmx_internal.Rout: ${@:.Rout=.R} ../config/param.yml
+clean_fish_sdmx_internal.Rout: ${@:.Rout=.R} ../downloadData/download_fish_sdmx_internal.Rout
+report_test_template_3.docx: ${@:.docx=.Rmd} ../readMergeData/clean_fish_sdmx_internal.Rout etc.
+```
+
+---
+
+## Challenges
+
+.center[![](assets/screenshot/legend.png)]
+
+- Plots
+  - formatting of plots: labels, legends, side-by-side plots and captions
+  - minimum redundancy of plot code with ggproto (date breaks, percent scales, etc.)
+
+- Data
+  - heterogeneous data coverage across geography and time
+  - silent revisions to source data variable codes
+
+- Text
+  - replicate changes to template text over time in Rnw and Rmd
+  - dynamic inclusion of body text (depending on data availability)
+
+- Docx output: ONE Author compliance (apply custom styles from docx template)
+
+---
+class: inverse, center, middle
+
+        </textarea>
+        <script src="../public/js/remark.min.js">
+        </script>
+        <script>
+         var slideshow = remark.create({
+             ratio: '16:9',
+             highlightLines: true
+         });
+        </script>
+    </body>
+</html>
